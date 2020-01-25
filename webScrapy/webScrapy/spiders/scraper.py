@@ -24,13 +24,25 @@ class ScraperSpider(CrawlSpider):
         url = "https://nursefly.com"
         choice = settings.user
         choice2 = settings.pwd
+        chrome_options = webdriver.ChromeOptions()
 
-        options = webdriver.ChromeOptions()
-        options.add_argument("--start-maximized")
+        #Colocar en prefs la direccion de tu carpeta de descarga
+        #Aqui se coloca la direccion por defecto para guardar
+        #prefs = {"download.default_directory": '/home/avalogics/Downloads/JIFFI'}
+
+
+        #path="C:/Users/ferna/OneDrive/Desktop/Nursa_downloads"
+        #prefs = {"download.default_directory": path }
+        #chrome_options.add_experimental_option('prefs',prefs)
+        #chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+
+        chrome_options.add_argument("--start-maximized")
         #options.add_experimental_option("download.default_directory", "C:/Users/ferna/OneDrive/Desktop/Nursa_downloads")
 
 
-        browser = webdriver.Chrome("C:/chromedriver.exe",chrome_options=options)
+        browser = webdriver.Chrome("C:/chromedriver.exe",chrome_options=chrome_options)
 
         browser.get(url)
         time.sleep(2)
