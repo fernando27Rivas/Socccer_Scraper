@@ -59,13 +59,13 @@ class ScraperSpider(CrawlSpider):
         #prefs = {"download.default_directory": path }
         chrome_options.add_experimental_option('prefs',prefs)
         chrome_options.add_argument('--headless')
-        chrome_options.add_argument('window-size=1920x1080')
+        #chrome_options.add_argument('window-size=1920x1080')
         chrome_options.add_argument("disable-gpu")
         #chrome_options.add_argument('--no-sandbox')
         #chrome_options.add_argument('--disable-dev-shm-usage')
 
         #chrome_options.add_argument("--start-maximized")
-        #options.add_experimental_option("download.default_directory", "C:/Users/ferna/OneDrive/Desktop/Nursa_downloads")
+
 
 
         browser = webdriver.Chrome("C:/chromedriver.exe",chrome_options=chrome_options)
@@ -83,20 +83,21 @@ class ScraperSpider(CrawlSpider):
                 "//body/div/div/div/div/div[contains(@class, 'auth-section')]/button[2]").click()
             time.sleep(self.short_sleep)
         try:
-            browser.find_element_by_xpath("//body/div/div/div/div/div/div/div/button[2]").click()
+            browser.find_element_by_xpath("//body/div/div/div/div/div/div/button[2]").click()
             time.sleep(self.short_sleep)
         except NoSuchElementException:
             pass
-            browser.find_element_by_xpath("//body/div/div/div/div/div/div/div/button[2]").click()
+            browser.find_element_by_xpath("//body/div/div/div/div/div/div/button[2]").click()
             time.sleep(self.short_sleep)
         try:
-            browser.find_element_by_xpath("//body/div[@id='root']/div[@class='CoreLayout  sc-gzVnrw fpqIpg']/div[4]/div[2]/div[2]/div[@class='auth-popup-tabs QA__SignPopup']/div[3]/div[2]/div[@class='sign-up-popup-buttons']/button[@class='QA__LoginWithEmail--Button sc-bdVaJa eYqrwp']").click()
+            browser.find_element_by_xpath(
+                "//body/div/div/div/div/div/div/div[2]/div/button[3]").click()
 
             time.sleep(self.short_sleep)
         except NoSuchElementException:
             pass
             browser.find_element_by_xpath(
-                "//body/div/div/div/div/div/div/div/div[contains(@style, 'overflow: hidden')]/div[contains(@class, 'sign-up-popup-buttons')]/button[contains(@class, 'QA')]").click()
+                "//body/div/div/div/div/div/div/div[2]/div/button[3]").click()
             time.sleep(self.short_sleep)
         try:
             user=browser.find_element_by_id('email')
