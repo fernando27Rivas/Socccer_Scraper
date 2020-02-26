@@ -16,11 +16,13 @@ from pathlib import Path
 import os
 from scrapy.http import Request
 
+
 #extract pdf functionality dependecies
 from tika import parser
 import glob
 import csv
 
+ 
 class ScraperSpider(CrawlSpider):
     name = 'scraper'
     allowed_domains = ['nursefly.com']
@@ -30,6 +32,8 @@ class ScraperSpider(CrawlSpider):
     short_sleep=2
     medium_sleep=4
     long_sleep=10
+
+
     def parse(self, response):
         url = "https://nursefly.com"
         choice = settings.user
@@ -37,7 +41,6 @@ class ScraperSpider(CrawlSpider):
         chrome_options = webdriver.ChromeOptions()
 
    
-
         #the folder path of this .py file 
         current_directory=str(Path().absolute())
         #adding pdf for windows chrome path change only to "/pdf/" on linux
@@ -52,7 +55,7 @@ class ScraperSpider(CrawlSpider):
         Path(path_dir).mkdir(parents=True,exist_ok=True)
         #avoid prompt severeal files downloaded and selecting the custom path for downloads
         prefs = {"download.default_directory": path_dir,"profile.default_content_setting_values.automatic_downloads": 1}#,"profile.managed_default_content_settings.images": 2}
-
+            
 
         
      
@@ -63,7 +66,6 @@ class ScraperSpider(CrawlSpider):
         #chrome_options.add_argument("disable-gpu")
         #chrome_options.add_argument('--no-sandbox')
         #chrome_options.add_argument('--disable-dev-shm-usage')
-
         chrome_options.add_argument("--start-maximized")
 
         browser = webdriver.Chrome(settings.chromedriver_path,chrome_options=chrome_options)
@@ -71,6 +73,7 @@ class ScraperSpider(CrawlSpider):
         browser.get(url)
         time.sleep(self.short_sleep)
         browser.get_cookies()
+        print(f"\033[94m Message: {settings.pwd} {settings.user} {settings.api_key} {settings.chromedriver_path} \033[0m")   
 
         try:
             browser.find_element_by_xpath("//body/div/div/div/div/div[contains(@class, 'auth-section')]/button[2]").click()

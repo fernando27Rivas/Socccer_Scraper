@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+from pathlib import Path  # python3 only
+from dotenv import load_dotenv
+import os
+
 
 # Scrapy settings for webScrapy project
 #
@@ -93,20 +97,12 @@ DOWNLOAD_DELAY = 8
 #YOU CAN EDIT THIS VARIABLE WITH THE VALUE THAT YOU WANT TO SEARCH IN THE PAGE
 
 
-user= "curtis@elitespecialtystaffing.com"
-pwd= "BTX2gUwd9pA-!-Nkub*GkwGJPmbwVXN@Yd8fshXB"
 
 
+path_env=Path(__file__).parent.parent.parent.absolute()/".env"
+load_dotenv(dotenv_path=path_env)
 
-
-#custom fields loaded from .env
-# settings.py
-import os
-from dotenv import load_dotenv
-from pathlib import Path  # python3 only
-
-env_path = Path('../../') / '.env'
-load_dotenv(dotenv_path=env_path)
-
-api_key=os.getenv('api_key')
 chromedriver_path=os.getenv('chromedriver_path')
+api_key=os.getenv("api_key")
+user= os.getenv('email')
+pwd= os.getenv('pwd')
