@@ -33,4 +33,4 @@ zope.interface==4.6.0
 #added dependecies
 pylint
 tika
-
+python-dotenv

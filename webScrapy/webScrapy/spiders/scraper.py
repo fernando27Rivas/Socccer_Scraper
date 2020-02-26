@@ -41,7 +41,7 @@ class ScraperSpider(CrawlSpider):
         #the folder path of this .py file 
         current_directory=str(Path().absolute())
         #adding pdf for windows chrome path change only to "/pdf/" on linux
-        pdf_directories=current_directory+'\\pdf\\'
+        pdf_directories=current_directory+'/pdf/'
         #defining the path when the data csv will be stored
         csv_dir=current_directory+"/data/"
         #naming a timestamp folder for pdf-cv downloaded at certain date
@@ -58,17 +58,15 @@ class ScraperSpider(CrawlSpider):
      
         #prefs = {"download.default_directory": path }
         chrome_options.add_experimental_option('prefs',prefs)
-        chrome_options.add_argument('--headless')
+        #chrome_options.add_argument('--headless')
         #chrome_options.add_argument('window-size=1920x1080')
-        chrome_options.add_argument("disable-gpu")
+        #chrome_options.add_argument("disable-gpu")
         #chrome_options.add_argument('--no-sandbox')
         #chrome_options.add_argument('--disable-dev-shm-usage')
 
-        #chrome_options.add_argument("--start-maximized")
+        chrome_options.add_argument("--start-maximized")
 
-
-
-        browser = webdriver.Chrome("C:/chromedriver.exe",chrome_options=chrome_options)
+        browser = webdriver.Chrome(settings.chromedriver_path,chrome_options=chrome_options)
 
         browser.get(url)
         time.sleep(self.short_sleep)
