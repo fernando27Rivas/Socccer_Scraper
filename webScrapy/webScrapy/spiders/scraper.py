@@ -55,7 +55,7 @@ class ScraperSpider(CrawlSpider):
         prefs = {"download.default_directory": path_dir,"profile.default_content_setting_values.automatic_downloads": 1}#,"profile.managed_default_content_settings.images": 2}
             
 
-        print(f"\033[94m {self.get_list_pdfs(path_dir)} \033[0m")          
+        print(f"\033[94m  \033[0m")          
      
         #prefs = {"download.default_directory": path }
         chrome_options.add_experimental_option('prefs',prefs)
@@ -160,20 +160,27 @@ class ScraperSpider(CrawlSpider):
 
         print("La cantidad de CV son: " +str( len(var_len)))
         i=1
-        while(i<=len(var_len)):
-            print(f"\033[94m Message: {i} \033[0m")   
+        #current pdfs
+        current_pdfs=self.get_list_pdfs_downloaded(path_dir)
 
-            try:
-                time.sleep(self.medium_sleep)
-                browser.find_element_by_xpath("//tr["+ str(i)+"]/td[6]/div/div/div[1]").click()
-            except NoSuchElementException:
-                pass
-                time.sleep(self.long_sleep)
-                browser.find_element_by_xpath("//tr[" + str(i) + "]/td[6]/div/div/div[1]").click()
-            #wait for iterate another time until pdf get downloaded
-            time.sleep(3)
-            while self.has_any_download_active(path_dir):
-                time.sleep(1)
+        while(i<=len(var_len)):
+            print(f"\033[94m Message: {i} \033[0m") 
+
+            nurse_name=self.get_actual_nurse(i,browser)
+
+            #if there's not name on pdf list it will be able to download a new pdf            
+            if(not nurse_name in current_pdfs):
+                try:
+                    time.sleep(self.medium_sleep)
+                    browser.find_element_by_xpath("//tr["+ str(i)+"]/td[6]/div/div/div[1]").click()
+                except NoSuchElementException:
+                    pass
+                    time.sleep(self.long_sleep)
+                    browser.find_element_by_xpath("//tr[" + str(i) + "]/td[6]/div/div/div[1]").click()
+                #wait for iterate another time until pdf get downloaded
+                time.sleep(3)
+                while self.has_any_download_active(path_dir):
+                    time.sleep(1)
             i=i+1
         #await for the last cv    
         time.sleep(self.long_sleep)
@@ -182,6 +189,12 @@ class ScraperSpider(CrawlSpider):
         print(f"\033[94m SCRIPT PDF \033[0m")   
         self.extractPdfData(pdf_path=path_dir,csv_path=csv_dir)
 
+    def get_actual_nurse(self,index,browser):
+        actual_nurse=browser.find_element_by_xpath(f"//tr[{index}]/td[2]").text #raw name from td
+        actual_nurse=actual_nurse.lower().split(' ') #separate words between spaces
+        separator='-' #separator
+        actual_nurse=separator.join(actual_nurse)
+        return actual_nurse
 
 
 
@@ -192,8 +205,10 @@ class ScraperSpider(CrawlSpider):
         else:
             return False
 
-    def get_list_pdfs(self,temp_folder):
-        list_pdf = sorted(Path(temp_folder).glob('*.pdf'))
+    def get_list_pdfs_downloaded(self,temp_folder):
+        list_pdf = glob.glob(temp_folder+'/*.pdf')
+        list_pdf=[pdf_name.split('/')[-1] for pdf_name in list_pdf] #pdf with .pdf ended
+        list_pdf=[pdf_name.split('-application.pdf')[0] for pdf_name in list_pdf] #pdf without pdf ended
         return list_pdf
         
     def extractPdfData(self,pdf_path,csv_path):
