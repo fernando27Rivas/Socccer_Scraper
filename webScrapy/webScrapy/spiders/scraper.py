@@ -14,6 +14,7 @@ from .. import settings
 from selenium.common.exceptions import NoSuchElementException
 from pathlib import Path
 import os
+import re
 from scrapy.http import Request
 
 
@@ -51,6 +52,8 @@ class ScraperSpider(CrawlSpider):
         
         #creating the path on the OS
         Path(path_dir).mkdir(parents=True,exist_ok=True)
+        Path(csv_dir).mkdir(parents=True,exist_ok=True)
+        
         #avoid prompt severeal files downloaded and selecting the custom path for downloads
         prefs = {"download.default_directory": path_dir,"profile.default_content_setting_values.automatic_downloads": 1}#,"profile.managed_default_content_settings.images": 2}
             
@@ -184,10 +187,11 @@ class ScraperSpider(CrawlSpider):
             i=i+1
         #await for the last cv    
         time.sleep(self.long_sleep)
-        
+        self.clean_repeated_pdfs(path_dir)
+
         browser.close()
         print(f"\033[94m SCRIPT PDF \033[0m")   
-        self.extractPdfData(pdf_path=path_dir,csv_path=csv_dir)
+        self.extractPdfDataToCsv(pdf_path=path_dir,csv_path=csv_dir)
 
     def get_actual_nurse(self,index,browser):
         actual_nurse=browser.find_element_by_xpath(f"//tr[{index}]/td[2]").text #raw name from td
@@ -197,6 +201,11 @@ class ScraperSpider(CrawlSpider):
         return actual_nurse
 
 
+    def clean_repeated_pdfs(self,path):
+        list_pdf = glob.glob(path+'/*.pdf')
+        for pdf in list_pdf:
+            if re.search(r'\([^)]*\)',pdf):
+                os.remove(pdf)
 
     def has_any_download_active(self,temp_folder):
         chrome_temp_file = sorted(Path(temp_folder).glob('*.crdownload'))
@@ -211,7 +220,7 @@ class ScraperSpider(CrawlSpider):
         list_pdf=[pdf_name.split('-application.pdf')[0] for pdf_name in list_pdf] #pdf without pdf ended
         return list_pdf
         
-    def extractPdfData(self,pdf_path,csv_path):
+    def extractPdfDataToCsv(self,pdf_path,csv_path):
         file_list=glob.glob(pdf_path+"/*.pdf")
         file_list=[file_path.replace('pdf\\','pdf/') for file_path in file_list]
 
