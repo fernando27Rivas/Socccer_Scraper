@@ -42,22 +42,20 @@ class ScraperSpider(CrawlSpider):
 
    
         #the folder path of this .py file 
-        current_directory=str(Path().absolute())
+        current_directory=str(Path(__file__).parent.parent.absolute())
         #adding pdf for windows chrome path change only to "/pdf/" on linux
-        pdf_directories=current_directory+'/pdf/'
+        path_dir=current_directory+'/pdf/'
         #defining the path when the data csv will be stored
         csv_dir=current_directory+"/data/"
-        #naming a timestamp folder for pdf-cv downloaded at certain date
-        directory_name=str(datetime.now().strftime('cv-downloaded-%Y-%m-%d-%H-%M-%S'))
-        #joning strings to get the path_dir where pdf files will be stored
-        path_dir=pdf_directories+directory_name
+
+        
         #creating the path on the OS
         Path(path_dir).mkdir(parents=True,exist_ok=True)
         #avoid prompt severeal files downloaded and selecting the custom path for downloads
         prefs = {"download.default_directory": path_dir,"profile.default_content_setting_values.automatic_downloads": 1}#,"profile.managed_default_content_settings.images": 2}
             
 
-        
+        print(f"\033[94m {self.get_list_pdfs(path_dir)} \033[0m")          
      
         #prefs = {"download.default_directory": path }
         chrome_options.add_experimental_option('prefs',prefs)
@@ -73,33 +71,36 @@ class ScraperSpider(CrawlSpider):
         browser.get(url)
         time.sleep(self.short_sleep)
         browser.get_cookies()
-        print(f"\033[94m Message: {settings.pwd} {settings.user} {settings.api_key} {settings.chromedriver_path} \033[0m")   
 
+        # xpath to click sign in button
         try:
-            browser.find_element_by_xpath("//body/div/div/div/div/div[contains(@class, 'auth-section')]/button[2]").click()
+            browser.find_element_by_xpath("//div[contains(@class, 'auth-section')]/button[2]").click()
             time.sleep(self.short_sleep)
-        except NoSuchElementException:
-            pass
-            browser.find_element_by_xpath(
-                "//body/div/div/div/div/div[contains(@class, 'auth-section')]/button[2]").click()
-            time.sleep(self.short_sleep)
-        try:
-            browser.find_element_by_xpath("//body/div/div/div/div/div/div/button[2]").click()
-            time.sleep(self.short_sleep)
-        except NoSuchElementException:
-            pass
-            browser.find_element_by_xpath("//body/div/div/div/div/div/div/button[2]").click()
-            time.sleep(self.short_sleep)
-        try:
-            browser.find_element_by_xpath(
-                "//body/div/div/div/div/div/div/div[2]/div/button[3]").click()
 
+        except NoSuchElementException:
+            pass
+            browser.find_element_by_xpath("//div[contains(@class, 'auth-section')]/button[2]").click()
+            time.sleep(self.short_sleep)
+
+        #xpath to click sing in div
+        try:
+            browser.find_element_by_xpath("//div[text()='Sign in']").click()
             time.sleep(self.short_sleep)
         except NoSuchElementException:
             pass
-            browser.find_element_by_xpath(
-                "//body/div/div/div/div/div/div/div[2]/div/button[3]").click()
+            browser.find_element_by_xpath("//div[text()='Sign in']").click()
             time.sleep(self.short_sleep)
+
+        #xpath to click login email
+        try:
+            browser.find_element_by_xpath("//button[contains(@class,'QA__LoginWithEmail--Button sc-bdVaJa gTGaiA')]").click()
+            time.sleep(self.short_sleep)
+        except NoSuchElementException:
+            pass
+            browser.find_element_by_xpath("//button[contains(@class,'QA__LoginWithEmail--Button sc-bdVaJa gTGaiA')]").click()
+            time.sleep(self.short_sleep)
+
+        #fill login info    
         try:
             user=browser.find_element_by_id('email')
             time.sleep(self.short_sleep)
@@ -129,6 +130,7 @@ class ScraperSpider(CrawlSpider):
             pass
             pasw.send_keys(choice2)
             time.sleep(self.short_sleep)
+        # submit to login
         try:
             browser.find_element_by_xpath("//button[@type='submit']").click()
         except NoSuchElementException:
@@ -137,21 +139,9 @@ class ScraperSpider(CrawlSpider):
 
         time.sleep(self.long_sleep)
 
-        # try:
-        #  browser.find_element_by_xpath("//body/div[@id='root']/div[@class='CoreLayout  sc-gzVnrw fpqIpg']/div[@class='global-header']/div[@class='main-header QA__DesktopHeader']/div[@class='auth-section']/div[@class='ProfileBadge']/div[@class='sc-bwzfXH mZRve']").click()
-        # except NoSuchElementException:
-        #     pass
-        #     time.sleep(self.short_sleep)
-        #     browser.find_element_by_xpath("//body/div[@id='root']/div[@class='CoreLayout  sc-gzVnrw fpqIpg']/div[@class='global-header']/div[@class='main-header QA__DesktopHeader']/div[@class='auth-section']/div[@class='ProfileBadge']/div[@class='sc-bwzfXH mZRve']").click()
-        # try:
-        #    time.sleep(self.long_sleep)
-        #    browser.find_element_by_xpath("//body/div[9]/div/div/div/div/div/div[1]/span/div/div/div").click()
-        # except NoSuchElementException:
-        #    pass
-        #    time.sleep(self.long_sleep)
-        #    browser.find_element_by_xpath("//body/div[9]/div/div/div/div/div/div[1]/span/div/div/div").click()
+        # redirect to dashboard url
         browser.get(url='https://www.nursefly.com/organization/48/admin')
-
+        #select section to see pdf list
         try:
             time.sleep(self.medium_sleep)
             browser.find_element_by_xpath("//tr/td[4]/a").click()
@@ -168,7 +158,6 @@ class ScraperSpider(CrawlSpider):
             time.sleep(self.short_sleep)
             var_len = browser.find_elements_by_xpath("//div/table/tbody/tr")
 
-        print("AQUI :V")
         print("La cantidad de CV son: " +str( len(var_len)))
         i=1
         while(i<=len(var_len)):
@@ -197,12 +186,16 @@ class ScraperSpider(CrawlSpider):
 
 
     def has_any_download_active(self,temp_folder):
-        chrome_temp_file = sorted(Path(temp_folder).glob('*.crdownload'))
+        chrome_temp_file = sorted(Path(temp_folder).glob('*.crdownload').)
         if(len(chrome_temp_file)>0):
             return True
         else:
             return False
 
+    def get_list_pdfs(self,temp_folder):
+        list_pdf = sorted(Path(temp_folder).glob('*.pdf'))
+        return list_pdf
+        
     def extractPdfData(self,pdf_path,csv_path):
         file_list=glob.glob(pdf_path+"/*.pdf")
         file_list=[file_path.replace('pdf\\','pdf/') for file_path in file_list]
