@@ -186,7 +186,7 @@ class ScraperSpider(CrawlSpider):
 
 
     def has_any_download_active(self,temp_folder):
-        chrome_temp_file = sorted(Path(temp_folder).glob('*.crdownload').)
+        chrome_temp_file = sorted(Path(temp_folder).glob('*.crdownload'))
         if(len(chrome_temp_file)>0):
             return True
         else:
