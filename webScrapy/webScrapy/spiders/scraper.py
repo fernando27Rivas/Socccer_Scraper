@@ -16,7 +16,7 @@ from pathlib import Path
 import pathlib
 import os
 import re
-from .. import  pdf_extraction
+from ..pdf_extraction import extract_data
 from scrapy.http import Request
 
 
@@ -72,6 +72,13 @@ class ScraperSpider(CrawlSpider):
         #chrome_options.add_argument('--no-sandbox')
         #chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument("--start-maximized")
+        #print(current_directory)
+
+        #exec(open(current_directory+ '/'+'pdf_extraction.py').read())
+
+
+
+
 
         browser = webdriver.Chrome(settings.chromedriver_path,chrome_options=chrome_options)
         #browser.get('chrome://settings/')
@@ -165,6 +172,7 @@ class ScraperSpider(CrawlSpider):
         element_ids=browser.find_element_by_xpath \
             ("//div/table/tbody/tr[1]/td[1]").text
 
+
         print("El ultimo ID es : " )
         print(element_ids)
 
@@ -182,13 +190,13 @@ class ScraperSpider(CrawlSpider):
 
 
 
-
+        count=0
         while(i<=len(var_len)):
             print(f"\033[94m Message: {i} \033[0m") 
-
+            count=count+1
             nurse_name=self.get_actual_nurse(i,browser)
             element_id = browser.find_element_by_xpath \
-                ("//div/table/tbody/tr[1]/td[1]").text
+                ("//div/table/tbody/tr["+ str(i) +"]/td[1]").text
             #if there's not name on pdf list it will be able to download a new pdf
             if( not(str(element_id)==str(comparator_id))):
                 if(not nurse_name in current_pdfs):
@@ -203,6 +211,8 @@ class ScraperSpider(CrawlSpider):
                     time.sleep(3)
                     while self.has_any_download_active(path_dir):
                         time.sleep(1)
+            else:
+                i=len(var_len)+1
             i=i+1
         #await for the last cv    
         time.sleep(self.long_sleep)
@@ -210,11 +220,17 @@ class ScraperSpider(CrawlSpider):
 
         browser.close()
         print(f"\033[94m SCRIPT PDF \033[0m")
+        print("Se descargaron "+ str(count) +" de la pagina Nursefly")
 
 
         if (save_data):
             self.write_csv(element_id=element_ids, csv_path=csv_dir)
-            pdf_extraction.extract_data()
+            file_list = glob.glob(current_directory + "/pdf/*.pdf")
+
+            file_list = [file_path.replace('\\', '/') for file_path in file_list]
+
+            extract_data(file_list)
+
 
 
 

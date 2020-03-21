@@ -32,5 +32,6 @@ zope.interface==4.6.0
 
 #added dependecies
 pylint
-tika
+tika==1.23
 python-dotenv
+jsonmerge

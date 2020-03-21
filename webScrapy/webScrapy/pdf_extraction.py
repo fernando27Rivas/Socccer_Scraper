@@ -8,8 +8,7 @@ import requests
 import json
 from jsonmerge import merge
 
-file_list=glob.glob("pdf/*.pdf")
-file_list=[file_path.replace('pdf\\','pdf/') for file_path in file_list]
+
 
 def is_first_cvtype(data):
     hasPersonalInfo="SUMMARY" in data
@@ -17,7 +16,9 @@ def is_first_cvtype(data):
 
 def extract_second_format(data,file_path):
     name_to_split=file_path.split('.pdf')[0]
-    name_to_split=name_to_split.split('/')[1].split('-application')[0]
+    print(name_to_split)
+    name_to_split=name_to_split.split('/pdf/')[1].split('-application')[0]
+    print(name_to_split)
     separator=" "
     #return [name, phone,email,address,ssn,birth,speciality,travel_experience]
 
@@ -96,9 +97,11 @@ def extract_second_format(data,file_path):
     return [name, phone,email,address,ssn,birth,speciality,travel_experience,certification,licences]
 
 def extract_first_format(data,file_path):
-        #get personal data
-    name_to_split=file_path.split('.pdf')[0]
-    name_to_split=name_to_split.split('/')[1].split('-application')[0]
+    #get personal data
+    name_to_split = file_path.split('.pdf')[0]
+    print(name_to_split)
+    name_to_split = name_to_split.split('/pdf/')[1].split('-application')[0]
+    print(name_to_split)
     separator=" "
 
     name=separator.join(name_to_split.split('-')) #full name get it
@@ -1475,9 +1478,12 @@ def delete_file(pdf_path):
 
 
 
-def extract_data():
+def extract_data(file_list):
+        print("Hola Mundo")
         list_s=[]
         count=0
+
+
         for file_path in file_list:
             #raw = parser.from_file("C:/Users/ferna/OneDrive/Desktop/PdfTikaExtractionPy/"+file_path)
             raw = parser.from_file(file_path)
@@ -1524,6 +1530,7 @@ def extract_data():
             else:
                 state=None
                 zip=None
+
             firstname=fullname.split()[0]
             lastname=fullname.split()[1]
             certifications=row[8]
@@ -1585,3 +1592,10 @@ def extract_data():
 
 
             delete_file(file_path)
+
+
+
+
+
+
+
