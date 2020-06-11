@@ -16,7 +16,6 @@ from pathlib import Path
 import pathlib
 import os
 import re
-from ..pdf_extraction import extract_data
 from scrapy.http import Request
 
 
@@ -49,7 +48,7 @@ class ScraperSpider(CrawlSpider):
         browser.get(url)
         time.sleep(10)
 
-   
+    ##Inittial comment
 
                 
 
