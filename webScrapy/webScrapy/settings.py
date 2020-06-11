@@ -99,10 +99,3 @@ DOWNLOAD_DELAY = 8
 
 
 
-path_env=Path(__file__).parent.parent.parent.absolute()/".env"
-load_dotenv(dotenv_path=path_env)
-
-chromedriver_path=os.getenv('chromedriver_path')
-api_key=os.getenv("api_key")
-user= os.getenv('email')
-pwd= os.getenv('pwd')
